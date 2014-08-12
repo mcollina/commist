@@ -1,0 +1,27 @@
+{
+  "name": "commist",
+  "version": "0.0.0",
+  "description": "Build your commands on minimist!",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test.js"
+  },
+  "pre-commit": "test",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcollina/commist.git"
+  },
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/commist/issues"
+  },
+  "homepage": "https://github.com/mcollina/commist",
+  "dependencies": {
+    "minimist": "^1.1.0"
+  },
+  "devDependencies": {
+    "pre-commit": "0.0.9",
+    "tap": "^0.4.12"
+  }
+}
