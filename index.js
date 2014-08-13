@@ -25,28 +25,36 @@ SOFTWARE.
 'use strict';
 
 var minimist = require('minimist')
+  , leven    = require('leven')
 
 function commist() {
 
   var commands = []
 
-  function lookup(parts) {
-    if (typeof parts === 'string')
-      parts = parts.split(' ')
+  function lookup(array) {
+    if (typeof array === 'string')
+      array = array.split(' ')
 
-    return commands.filter(function(cmd) {
-      return cmd.match(parts)
+    return commands.map(function(cmd) {
+      return cmd.match(array)
+    }).filter(function(match) {
+      return match.partsNotMatched === 0
     }).sort(function(a, b) {
-      if (a.length > b.length)
-        return -1
-      else
+      if (a.inputNotMatched > b.inputNotMatched)
         return 1
+
+      if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance)
+        return 1
+
+      return -1
+    }).map(function(match) {
+      return match.cmd
     })
   }
 
   function parse(args) {
     var argv = minimist(args)
-      , matching = lookup(argv._)
+      , matching = lookup(argv._.join(' '))
 
     if (matching.length > 0) {
       matching[0].call(argv)
@@ -59,15 +67,14 @@ function commist() {
   }
 
   function register(command, func) {
-    var parts     = command.split(' ')
-      , matching  = lookup(parts)
+    var matching  = lookup(command)
 
     matching.forEach(function(match) {
-      if (match.length === parts.length)
+      if (match.string === command)
         throw new Error('command already registered: ' + command)
     })
 
-    commands.push(new Command(parts, func))
+    commands.push(new Command(command, func))
 
     return this
   }
@@ -79,10 +86,16 @@ function commist() {
   }
 }
 
-function Command(parts, func) {
-  this.parts = parts
-  this.length = parts.length
-  this.func = func
+function Command(string, func) {
+  this.string   = string
+  this.parts    = string.split(' ')
+  this.length   = this.parts.length
+  this.func     = func
+
+  this.parts.forEach(function(part) {
+    if (part.length < 3)
+      throw new Error('command words must be at least 3 chars: ' + command)
+  })
 }
 
 Command.prototype.call = function call(argv) {
@@ -97,10 +110,24 @@ Command.prototype.call = function call(argv) {
   }, {}))
 }
 
-Command.prototype.match = function match(args) {
-  return this.parts.reduce(function(acc, part, i) {
-    return acc && part === args[i]
-  }, true)
+Command.prototype.match = function match(string) {
+  return new CommandMatch(this, string)
+}
+
+function CommandMatch(cmd, array) {
+  this.cmd = cmd
+  this.distances = cmd.parts.map(function(elem, i) {
+    if (array[i] !== undefined)
+      return leven(elem, array[i])
+    else
+      return undefined
+  }).filter(function(distance, i) {
+    return distance !== undefined && distance < cmd.parts[i].length - 2
+  })
+
+  this.partsNotMatched = cmd.length - this.distances.length
+  this.inputNotMatched = array.length - this.distances.length
+  this.totalDistance = this.distances.reduce(function(acc, i) { return acc + i }, 0)
 }
 
 module.exports = commist

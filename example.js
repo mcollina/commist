@@ -3,10 +3,10 @@ var program = require('./')()
   , result
 
 result = program
-  .register('do', function(args) {
+  .register('abcd', function(args) {
     console.log('just do', args)
   })
-  .register('do code', function(args) {
+  .register('abcde code', function(args) {
     console.log('doing something', args)
   })
   .register('another command', function(args) {

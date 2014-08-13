@@ -9,10 +9,10 @@ var program = require('commist')()
   , result
 
 result = program
-  .register('do', function(args) {
+  .register('abcd', function(args) {
     console.log('just do', args)
   })
-  .register('do code', function(args) {
+  .register('abcde code', function(args) {
     console.log('doing something', args)
   })
   .register('another command', function(args) {
@@ -23,6 +23,21 @@ result = program
 if (result) {
   console.log('no command called, args', result)
 }
+```
+
+When calling _commist_ programs, you can abbreviate down to three char
+words. In the above example, these are valid commands:
+
+```
+node example.js abc
+node example.js abc cod
+node example.js anot comm
+```
+
+Moreover, little spelling mistakes are corrected too:
+
+```
+node example.js abcs cod
 ```
 
 Acknowledgements

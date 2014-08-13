@@ -138,3 +138,69 @@ test('looking up commands', function(t) {
 
   t.end()
 })
+
+test('looking up commands with abbreviations', function(t) {
+  var program = commist()
+    , result
+
+  function noop1() {}
+  function noop2() {}
+  function noop3() {}
+
+  program.register('hello', noop1)
+  program.register('hello world matteo', noop3)
+  program.register('hello world', noop2)
+
+  t.equal(program.lookup('hel')[0].func, noop1)
+  t.equal(program.lookup('hel wor mat')[0].func, noop3)
+  t.equal(program.lookup('hel wor')[0].func, noop2)
+
+  t.end()
+})
+
+test('executing commands from abbreviations', function(t) {
+  t.plan(1)
+
+  var program = commist()
+    , result
+
+  program.register('hello', function(args) {
+    t.deepEqual(args, { _: ['a'], x: 23 })
+  })
+
+  program.register('hello world', function(args) {
+    t.ok(false, 'must pick the right command')
+  })
+
+  program.parse(['hel', 'a', '-x', '23'])
+})
+
+test('a command must be at least 3 chars', function(t) {
+  var program = commist()
+    , result
+
+  function noop1() {}
+
+  try {
+    program.register('h', noop1)
+    t.ok(false, 'not thrown')
+  } catch(err) {
+  }
+
+  t.end()
+})
+
+test('a command part must be at least 3 chars', function(t) {
+  var program = commist()
+    , result
+
+  function noop1() {}
+
+  try {
+    program.register('h b', noop1)
+    t.ok(false, 'not thrown')
+  } catch(err) {
+  }
+
+  t.end()
+})
