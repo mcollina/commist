@@ -2,14 +2,19 @@ commist
 =======
 
 Build command line application with multiple commands the easy way.
-Built on minimist.
+To be used with [minimist](http://npm.im/minimist).
 
 ```js
 var program = require('commist')()
+  , minimist = require('minimist')
   , result
 
 result = program
   .register('abcd', function(args) {
+    console.log('just do', args)
+  })
+  .register('args', function(args) {
+    args = minimist(args)
     console.log('just do', args)
   })
   .register('abcde code', function(args) {

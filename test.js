@@ -1,22 +1,7 @@
 
-var test      = require('tap').test
+var test      = require('tape').test
   , commist   = require('./')
   , minimist  = require('minimist')
-
-test('parsing as minimist', function(t) {
-  var program = commist()
-    , args    = ['a', 'b', 'c']
-
-  function minitest(args) {
-    t.deepEqual(program.parse(args), minimist(args))
-  }
-
-  minitest(['a', 'b', 'c'])
-  minitest(['a', '-b', '-c', 23])
-  minitest(['a', '-bde'])
-
-  t.end()
-})
 
 test('registering a command', function(t) {
   t.plan(2)
@@ -25,7 +10,7 @@ test('registering a command', function(t) {
     , result
 
   program.register('hello', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   result = program.parse(['hello', 'a', '-x', '23'])
@@ -44,7 +29,7 @@ test('registering two commands', function(t) {
   })
 
   program.register('world', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.parse(['world', 'a', '-x', '23'])
@@ -57,7 +42,7 @@ test('registering two commands (bis)', function(t) {
     , result
 
   program.register('hello', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.register('world', function(args) {
@@ -78,7 +63,7 @@ test('registering two words commands', function(t) {
   })
 
   program.register('hello world', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.parse(['hello', 'world', 'a', '-x', '23'])
@@ -91,7 +76,7 @@ test('registering two words commands (bis)', function(t) {
     , result
 
   program.register('hello', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.register('hello world', function(args) {
@@ -165,7 +150,7 @@ test('executing commands from abbreviations', function(t) {
     , result
 
   program.register('hello', function(args) {
-    t.deepEqual(args, { _: ['a'], x: 23 })
+    t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.register('hello world', function(args) {

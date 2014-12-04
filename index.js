@@ -24,8 +24,7 @@ SOFTWARE.
 
 'use strict';
 
-var minimist = require('minimist')
-  , leven    = require('leven')
+var leven = require('leven')
 
 function commist() {
 
@@ -53,17 +52,16 @@ function commist() {
   }
 
   function parse(args) {
-    var argv = minimist(args)
-      , matching = lookup(argv._.join(' '))
+    var matching = lookup(args)
 
     if (matching.length > 0) {
-      matching[0].call(argv)
+      matching[0].call(args)
 
       // return null if there is nothing left to do
       return null
     }
 
-    return argv
+    return args
   }
 
   function register(command, func) {
@@ -99,15 +97,7 @@ function Command(string, func) {
 }
 
 Command.prototype.call = function call(argv) {
-  var that = this
-  this.func(Object.keys(argv).reduce(function(obj, key) {
-    if (key === '_')
-      obj._ = argv._.slice(that.length)
-    else
-      obj[key] = argv[key]
-
-    return obj
-  }, {}))
+  this.func(argv.slice(this.length))
 }
 
 Command.prototype.match = function match(string) {
