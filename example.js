@@ -7,6 +7,9 @@ result = program
   .register('abcd', function(args) {
     console.log('just do', args)
   })
+  .register({ command: 'restore', equals: true }, function(args) {
+    console.log('restore', args)
+  })
   .register('args', function(args) {
     args = minimist(args)
     console.log('just do', args)

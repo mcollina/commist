@@ -143,6 +143,22 @@ test('looking up commands with abbreviations', function(t) {
   t.end()
 })
 
+test('looking up strict commands', function(t) {
+  var program = commist()
+
+  function noop1() {}
+  function noop2() {}
+
+  program.register({ command: 'restore', equals: true }, noop1)
+  program.register({ command: 'rest', equals: true }, noop2)
+
+  t.equal(program.lookup('restore')[0].func, noop1)
+  t.equal(program.lookup('rest')[0].func, noop2)
+  t.equal(program.lookup('remove')[0], undefined)
+
+  t.end()
+})
+
 test('executing commands from abbreviations', function(t) {
   t.plan(1)
 

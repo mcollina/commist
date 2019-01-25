@@ -64,7 +64,13 @@ function commist() {
     return args
   }
 
-  function register(command, func) {
+  function register(inputCommand, func) {
+    var command = inputCommand
+    var strict = false
+    if(typeof command === 'object'){
+      command = inputCommand.command
+      strict = inputCommand.equals || false
+    }
     var matching  = lookup(command)
 
     matching.forEach(function(match) {
@@ -72,7 +78,7 @@ function commist() {
         throw new Error('command already registered: ' + command)
     })
 
-    commands.push(new Command(command, func))
+    commands.push(new Command(command, strict, func))
 
     return this
   }
@@ -84,8 +90,9 @@ function commist() {
   }
 }
 
-function Command(string, func) {
+function Command(string, strict, func) {
   this.string   = string
+  this.strict   = strict
   this.parts    = string.split(' ')
   this.length   = this.parts.length
   this.func     = func
@@ -107,9 +114,13 @@ Command.prototype.match = function match(string) {
 function CommandMatch(cmd, array) {
   this.cmd = cmd
   this.distances = cmd.parts.map(function(elem, i) {
-    if (array[i] !== undefined)
-      return leven(elem, array[i])
-    else
+    if (array[i] !== undefined) {
+      if(cmd.strict) {
+        return elem === array[i] ? 0 : undefined
+      } else {
+        return leven(elem, array[i])
+      }
+    } else
       return undefined
   }).filter(function(distance, i) {
     return distance !== undefined && distance < cmd.parts[i].length - 2
