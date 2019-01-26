@@ -65,20 +65,24 @@ function commist() {
   }
 
   function register(inputCommand, func) {
-    var command = inputCommand
-    var strict = false
-    if(typeof command === 'object'){
-      command = inputCommand.command
-      strict = inputCommand.equals || false
+    var commandOptions = {
+      command: inputCommand,
+      strict: false,
+      func: func
     }
-    var matching  = lookup(command)
+
+    if(typeof inputCommand === 'object'){
+      commandOptions = Object.assign(commandOptions, inputCommand)
+    }
+
+    var matching  = lookup(commandOptions.command)
 
     matching.forEach(function(match) {
-      if (match.string === command)
-        throw new Error('command already registered: ' + command)
+      if (match.string === commandOptions.command)
+        throw new Error('command already registered: ' + commandOptions.command)
     })
 
-    commands.push(new Command(command, strict, func))
+    commands.push(new Command(commandOptions))
 
     return this
   }
@@ -90,12 +94,12 @@ function commist() {
   }
 }
 
-function Command(string, strict, func) {
-  this.string   = string
-  this.strict   = strict
-  this.parts    = string.split(' ')
+function Command(options) {
+  this.string   = options.command
+  this.strict   = options.strict
+  this.parts    = this.string.split(' ')
   this.length   = this.parts.length
-  this.func     = func
+  this.func     = options.func
 
   this.parts.forEach(function(part) {
     if (part.length < 3)

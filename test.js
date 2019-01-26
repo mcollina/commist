@@ -149,8 +149,8 @@ test('looking up strict commands', function(t) {
   function noop1() {}
   function noop2() {}
 
-  program.register({ command: 'restore', equals: true }, noop1)
-  program.register({ command: 'rest', equals: true }, noop2)
+  program.register({ command: 'restore', strict: true }, noop1)
+  program.register({ command: 'rest', strict: true }, noop2)
 
   t.equal(program.lookup('restore')[0].func, noop1)
   t.equal(program.lookup('rest')[0].func, noop2)

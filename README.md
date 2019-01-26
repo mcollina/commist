@@ -52,7 +52,7 @@ If you want that the command must be strict equals, you can register the
 command with the json configuration:
 
 ```js
-  program.register({ command: 'restore', equals: true }, function(args) {
+  program.register({ command: 'restore', strict: true }, function(args) {
     console.log('restore', args)
   })
 ```
