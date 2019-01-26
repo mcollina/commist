@@ -4,7 +4,7 @@
   "description": "Build your commands on minimist!",
   "main": "index.js",
   "scripts": {
-    "test": "tap test.js"
+    "test": "standard && tap test.js"
   },
   "pre-commit": "test",
   "repository": {
@@ -24,6 +24,7 @@
   "devDependencies": {
     "minimist": "^1.1.0",
     "pre-commit": "0.0.9",
+    "standard": "^12.0.1",
     "tape": "^3.0.3"
   }
 }
