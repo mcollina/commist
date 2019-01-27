@@ -22,36 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-'use strict';
+'use strict'
 
 var leven = require('leven')
 
-function commist() {
-
+function commist () {
   var commands = []
 
-  function lookup(array) {
-    if (typeof array === 'string')
-      array = array.split(' ')
+  function lookup (array) {
+    if (typeof array === 'string') { array = array.split(' ') }
 
-    return commands.map(function(cmd) {
+    return commands.map(function (cmd) {
       return cmd.match(array)
-    }).filter(function(match) {
+    }).filter(function (match) {
       return match.partsNotMatched === 0
-    }).sort(function(a, b) {
-      if (a.inputNotMatched > b.inputNotMatched)
-        return 1
+    }).sort(function (a, b) {
+      if (a.inputNotMatched > b.inputNotMatched) { return 1 }
 
-      if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance)
-        return 1
+      if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance) { return 1 }
 
       return -1
-    }).map(function(match) {
+    }).map(function (match) {
       return match.cmd
     })
   }
 
-  function parse(args) {
+  function parse (args) {
     var matching = lookup(args)
 
     if (matching.length > 0) {
@@ -64,60 +60,72 @@ function commist() {
     return args
   }
 
-  function register(command, func) {
-    var matching  = lookup(command)
+  function register (inputCommand, func) {
+    var commandOptions = {
+      command: inputCommand,
+      strict: false,
+      func: func
+    }
 
-    matching.forEach(function(match) {
-      if (match.string === command)
-        throw new Error('command already registered: ' + command)
+    if (typeof inputCommand === 'object') {
+      commandOptions = Object.assign(commandOptions, inputCommand)
+    }
+
+    var matching = lookup(commandOptions.command)
+
+    matching.forEach(function (match) {
+      if (match.string === commandOptions.command) { throw new Error('command already registered: ' + commandOptions.command) }
     })
 
-    commands.push(new Command(command, func))
+    commands.push(new Command(commandOptions))
 
     return this
   }
 
   return {
-      register: register
-    , parse: parse
-    , lookup: lookup
+    register: register,
+    parse: parse,
+    lookup: lookup
   }
 }
 
-function Command(string, func) {
-  this.string   = string
-  this.parts    = string.split(' ')
-  this.length   = this.parts.length
-  this.func     = func
+function Command (options) {
+  this.string = options.command
+  this.strict = options.strict
+  this.parts = this.string.split(' ')
+  this.length = this.parts.length
+  this.func = options.func
 
-  this.parts.forEach(function(part) {
-    if (part.length < 3)
-      throw new Error('command words must be at least 3 chars: ' + command)
+  this.parts.forEach(function (part) {
+    if (part.length < 3) { throw new Error('command words must be at least 3 chars: ' + options.command) }
   })
 }
 
-Command.prototype.call = function call(argv) {
+Command.prototype.call = function call (argv) {
   this.func(argv.slice(this.length))
 }
 
-Command.prototype.match = function match(string) {
+Command.prototype.match = function match (string) {
   return new CommandMatch(this, string)
 }
 
-function CommandMatch(cmd, array) {
+function CommandMatch (cmd, array) {
   this.cmd = cmd
-  this.distances = cmd.parts.map(function(elem, i) {
-    if (array[i] !== undefined)
-      return leven(elem, array[i])
-    else
-      return undefined
-  }).filter(function(distance, i) {
+  this.distances = cmd.parts.map(function (elem, i) {
+    if (array[i] !== undefined) {
+      if (cmd.strict) {
+        return elem === array[i] ? 0 : undefined
+      } else {
+        return leven(elem, array[i])
+      }
+    } else { return undefined }
+  }).filter(function (distance, i) {
     return distance !== undefined && distance < cmd.parts[i].length - 2
   })
 
   this.partsNotMatched = cmd.length - this.distances.length
   this.inputNotMatched = array.length - this.distances.length
-  this.totalDistance = this.distances.reduce(function(acc, i) { return acc + i }, 0)
+  this.totalDistance = this.distances.reduce(function (acc, i) { return acc + i }, 0)
 }
 
 module.exports = commist

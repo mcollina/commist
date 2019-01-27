@@ -1,15 +1,16 @@
 
-var test      = require('tape').test
-  , commist   = require('./')
-  , minimist  = require('minimist')
+var test = require('tape').test
 
-test('registering a command', function(t) {
+var commist = require('./')
+
+test('registering a command', function (t) {
   t.plan(2)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  var result
+
+  program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
@@ -18,79 +19,74 @@ test('registering a command', function(t) {
   t.notOk(result, 'must return null, the command have been handled')
 })
 
-test('registering two commands', function(t) {
+test('registering two commands', function (t) {
   t.plan(1)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  program.register('hello', function (args) {
     t.ok(false, 'must pick the right command')
   })
 
-  program.register('world', function(args) {
+  program.register('world', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.parse(['world', 'a', '-x', '23'])
 })
 
-test('registering two commands (bis)', function(t) {
+test('registering two commands (bis)', function (t) {
   t.plan(1)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
-  program.register('world', function(args) {
+  program.register('world', function (args) {
     t.ok(false, 'must pick the right command')
   })
 
   program.parse(['hello', 'a', '-x', '23'])
 })
 
-test('registering two words commands', function(t) {
+test('registering two words commands', function (t) {
   t.plan(1)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  program.register('hello', function (args) {
     t.ok(false, 'must pick the right command')
   })
 
-  program.register('hello world', function(args) {
+  program.register('hello world', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
   program.parse(['hello', 'world', 'a', '-x', '23'])
 })
 
-test('registering two words commands (bis)', function(t) {
+test('registering two words commands (bis)', function (t) {
   t.plan(1)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
-  program.register('hello world', function(args) {
+  program.register('hello world', function (args) {
     t.ok(false, 'must pick the right command')
   })
 
   program.parse(['hello', 'a', '-x', '23'])
 })
 
-test('registering ambiguous commands throws exception', function(t) {
+test('registering ambiguous commands throws exception', function (t) {
   var program = commist()
-    , result
 
-  function noop() {}
+  function noop () {}
 
   program.register('hello', noop)
   program.register('hello world', noop)
@@ -99,19 +95,18 @@ test('registering ambiguous commands throws exception', function(t) {
   try {
     program.register('hello world', noop)
     t.ok(false, 'must throw if double-registering the same command')
-  } catch(err) {
+  } catch (err) {
   }
 
   t.end()
 })
 
-test('looking up commands', function(t) {
+test('looking up commands', function (t) {
   var program = commist()
-    , result
 
-  function noop1() {}
-  function noop2() {}
-  function noop3() {}
+  function noop1 () {}
+  function noop2 () {}
+  function noop3 () {}
 
   program.register('hello', noop1)
   program.register('hello world matteo', noop3)
@@ -124,13 +119,12 @@ test('looking up commands', function(t) {
   t.end()
 })
 
-test('looking up commands with abbreviations', function(t) {
+test('looking up commands with abbreviations', function (t) {
   var program = commist()
-    , result
 
-  function noop1() {}
-  function noop2() {}
-  function noop3() {}
+  function noop1 () {}
+  function noop2 () {}
+  function noop3 () {}
 
   program.register('hello', noop1)
   program.register('hello world matteo', noop3)
@@ -143,48 +137,61 @@ test('looking up commands with abbreviations', function(t) {
   t.end()
 })
 
-test('executing commands from abbreviations', function(t) {
+test('looking up strict commands', function (t) {
+  var program = commist()
+
+  function noop1 () {}
+  function noop2 () {}
+
+  program.register({ command: 'restore', strict: true }, noop1)
+  program.register({ command: 'rest', strict: true }, noop2)
+
+  t.equal(program.lookup('restore')[0].func, noop1)
+  t.equal(program.lookup('rest')[0].func, noop2)
+  t.equal(program.lookup('remove')[0], undefined)
+
+  t.end()
+})
+
+test('executing commands from abbreviations', function (t) {
   t.plan(1)
 
   var program = commist()
-    , result
 
-  program.register('hello', function(args) {
+  program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
-  program.register('hello world', function(args) {
+  program.register('hello world', function (args) {
     t.ok(false, 'must pick the right command')
   })
 
   program.parse(['hel', 'a', '-x', '23'])
 })
 
-test('a command must be at least 3 chars', function(t) {
+test('a command must be at least 3 chars', function (t) {
   var program = commist()
-    , result
 
-  function noop1() {}
+  function noop1 () {}
 
   try {
     program.register('h', noop1)
     t.ok(false, 'not thrown')
-  } catch(err) {
+  } catch (err) {
   }
 
   t.end()
 })
 
-test('a command part must be at least 3 chars', function(t) {
+test('a command part must be at least 3 chars', function (t) {
   var program = commist()
-    , result
 
-  function noop1() {}
+  function noop1 () {}
 
   try {
     program.register('h b', noop1)
     t.ok(false, 'not thrown')
-  } catch(err) {
+  } catch (err) {
   }
 
   t.end()
