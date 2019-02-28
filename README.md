@@ -1,6 +1,8 @@
 commist
 =======
 
+[![Build Status](https://travis-ci.com/mcollina/commist.svg?branch=master)](https://travis-ci.com/mcollina/commist)
+
 Build command line application with multiple commands the easy way.
 To be used with [minimist](http://npm.im/minimist).
 
