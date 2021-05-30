@@ -1,7 +1,7 @@
 /*
 The MIT License (MIT)
 
-Copyright (c) 2014 Matteo Collina
+Copyright (c) 2014-2021 Matteo Collina
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,10 +24,10 @@ SOFTWARE.
 
 'use strict'
 
-var leven = require('leven')
+const leven = require('leven')
 
 function commist () {
-  var commands = []
+  const commands = []
 
   function lookup (array) {
     if (typeof array === 'string') { array = array.split(' ') }
@@ -48,7 +48,7 @@ function commist () {
   }
 
   function parse (args) {
-    var matching = lookup(args)
+    const matching = lookup(args)
 
     if (matching.length > 0) {
       matching[0].call(args)
@@ -61,7 +61,7 @@ function commist () {
   }
 
   function register (inputCommand, func) {
-    var commandOptions = {
+    let commandOptions = {
       command: inputCommand,
       strict: false,
       func: func
@@ -71,7 +71,7 @@ function commist () {
       commandOptions = Object.assign(commandOptions, inputCommand)
     }
 
-    var matching = lookup(commandOptions.command)
+    const matching = lookup(commandOptions.command)
 
     matching.forEach(function (match) {
       if (match.string === commandOptions.command) { throw new Error('command already registered: ' + commandOptions.command) }
