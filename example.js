@@ -1,9 +1,8 @@
+'use strict'
 
-var program = require('./')()
-var minimist = require('minimist')
-var result
-
-result = program
+const program = require('./')()
+const minimist = require('minimist')
+const result = program
   .register('abcd', function (args) {
     console.log('just do', args)
   })

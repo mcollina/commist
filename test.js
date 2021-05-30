@@ -1,20 +1,18 @@
 
-var test = require('tape').test
+const test = require('tape').test
 
-var commist = require('./')
+const commist = require('./')
 
 test('registering a command', function (t) {
   t.plan(2)
 
-  var program = commist()
-
-  var result
+  const program = commist()
 
   program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
   })
 
-  result = program.parse(['hello', 'a', '-x', '23'])
+  const result = program.parse(['hello', 'a', '-x', '23'])
 
   t.notOk(result, 'must return null, the command have been handled')
 })
@@ -22,7 +20,7 @@ test('registering a command', function (t) {
 test('registering two commands', function (t) {
   t.plan(1)
 
-  var program = commist()
+  const program = commist()
 
   program.register('hello', function (args) {
     t.ok(false, 'must pick the right command')
@@ -38,7 +36,7 @@ test('registering two commands', function (t) {
 test('registering two commands (bis)', function (t) {
   t.plan(1)
 
-  var program = commist()
+  const program = commist()
 
   program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
@@ -54,7 +52,7 @@ test('registering two commands (bis)', function (t) {
 test('registering two words commands', function (t) {
   t.plan(1)
 
-  var program = commist()
+  const program = commist()
 
   program.register('hello', function (args) {
     t.ok(false, 'must pick the right command')
@@ -70,7 +68,7 @@ test('registering two words commands', function (t) {
 test('registering two words commands (bis)', function (t) {
   t.plan(1)
 
-  var program = commist()
+  const program = commist()
 
   program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
@@ -84,7 +82,7 @@ test('registering two words commands (bis)', function (t) {
 })
 
 test('registering ambiguous commands throws exception', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop () {}
 
@@ -102,7 +100,7 @@ test('registering ambiguous commands throws exception', function (t) {
 })
 
 test('looking up commands', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop1 () {}
   function noop2 () {}
@@ -120,7 +118,7 @@ test('looking up commands', function (t) {
 })
 
 test('looking up commands with abbreviations', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop1 () {}
   function noop2 () {}
@@ -138,7 +136,7 @@ test('looking up commands with abbreviations', function (t) {
 })
 
 test('looking up strict commands', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop1 () {}
   function noop2 () {}
@@ -156,7 +154,7 @@ test('looking up strict commands', function (t) {
 test('executing commands from abbreviations', function (t) {
   t.plan(1)
 
-  var program = commist()
+  const program = commist()
 
   program.register('hello', function (args) {
     t.deepEqual(args, ['a', '-x', '23'])
@@ -170,7 +168,7 @@ test('executing commands from abbreviations', function (t) {
 })
 
 test('a command must be at least 3 chars', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop1 () {}
 
@@ -184,7 +182,7 @@ test('a command must be at least 3 chars', function (t) {
 })
 
 test('a command part must be at least 3 chars', function (t) {
-  var program = commist()
+  const program = commist()
 
   function noop1 () {}
 
