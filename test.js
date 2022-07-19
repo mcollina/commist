@@ -3,6 +3,7 @@
 const test = require('tape').test
 
 const commist = require('./')
+const leven = require('./leven')
 
 test('registering a command', function (t) {
   t.plan(2)
@@ -168,16 +169,24 @@ test('executing commands from abbreviations', function (t) {
   program.parse(['hel', 'a', '-x', '23'])
 })
 
-test('a command must be at least 3 chars', function (t) {
+test('one char command', function (t) {
   const program = commist()
 
   function noop1 () {}
 
-  try {
-    program.register('h', noop1)
-    t.ok(false, 'not thrown')
-  } catch (err) {
-  }
+  program.register('h', noop1)
+  t.equal(program.lookup('h')[0].func, noop1)
+
+  t.end()
+})
+
+test('two char command', function (t) {
+  const program = commist()
+
+  function noop1 () {}
+
+  program.register('he', noop1)
+  t.equal(program.lookup('he')[0].func, noop1)
 
   t.end()
 })
@@ -187,11 +196,44 @@ test('a command part must be at least 3 chars', function (t) {
 
   function noop1 () {}
 
-  try {
-    program.register('h b', noop1)
-    t.ok(false, 'not thrown')
-  } catch (err) {
-  }
+  program.register('h b', noop1)
 
+  t.equal(program.lookup('h b')[0].func, noop1)
+
+  t.end()
+})
+
+test('short commands match exactly', function (t) {
+  const program = commist()
+
+  function noop1 () {}
+  function noop2 () {}
+
+  program.register('h', noop1)
+  program.register('help', noop2)
+
+  t.equal(program.lookup('h')[0].func, noop1)
+  t.equal(program.lookup('he')[0].func, noop2)
+  t.equal(program.lookup('hel')[0].func, noop2)
+  t.equal(program.lookup('help')[0].func, noop2)
+
+  t.end()
+})
+
+test('leven', function (t) {
+  t.is(leven('a', 'b'), 1)
+  t.is(leven('ab', 'ac'), 1)
+  t.is(leven('ac', 'bc'), 1)
+  t.is(leven('abc', 'axc'), 1)
+  t.is(leven('kitten', 'sitting'), 3)
+  t.is(leven('xabxcdxxefxgx', '1ab2cd34ef5g6'), 6)
+  t.is(leven('cat', 'cow'), 2)
+  t.is(leven('xabxcdxxefxgx', 'abcdefg'), 6)
+  t.is(leven('javawasneat', 'scalaisgreat'), 7)
+  t.is(leven('example', 'samples'), 3)
+  t.is(leven('sturgeon', 'urgently'), 6)
+  t.is(leven('levenshtein', 'frankenstein'), 6)
+  t.is(leven('distance', 'difference'), 5)
+  t.is(leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'), 2)
   t.end()
 })
