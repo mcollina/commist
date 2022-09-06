@@ -5,10 +5,11 @@ Build command line application with multiple commands the easy way.
 To be used with [minimist](http://npm.im/minimist).
 
 ```js
-'use strict'
+var program = require('commist')()
+  , minimist = require('minimist')
+  , result
 
-const program = require('commist')()
-const result = program
+result = program
   .register('abcd', function(args) {
     console.log('just do', args)
   })
@@ -55,28 +56,6 @@ command with the json configuration:
     console.log('restore', args)
   })
 ```
-
-If you want to limit the maximum levenshtein distance of your commands, you
-can use `maxDistance: 2`:
-
-```js
-const program = require('commist')({
-  maxDistance: 2
-})
-const result = program
-  .register('abcd', function(args) {
-    console.log('just do', args)
-  })
-  .register('abcdefgh', function(args) {
-    console.log('just do', args)
-  })
-  .parse(process.argv.splice(2))
-
-if (result) {
-  console.log('no command called, args', result)
-}
-```
-
 
 License
 -------

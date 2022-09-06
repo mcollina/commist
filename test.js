@@ -213,7 +213,7 @@ test('short commands match exactly', function (t) {
   program.register('help', noop2)
 
   t.equal(program.lookup('h')[0].func, noop1)
-  t.equal(program.lookup('he')[0].func, noop1)
+  t.equal(program.lookup('he')[0].func, noop2)
   t.equal(program.lookup('hel')[0].func, noop2)
   t.equal(program.lookup('help')[0].func, noop2)
 
@@ -235,25 +235,5 @@ test('leven', function (t) {
   t.is(leven('levenshtein', 'frankenstein'), 6)
   t.is(leven('distance', 'difference'), 5)
   t.is(leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'), 2)
-  t.end()
-})
-
-test('max distance', function (t) {
-  const program = commist({ maxDistance: 2 })
-
-  function noop1 () {}
-  function noop2 () {}
-  function noop3 () {}
-
-  program.register('hello', noop1)
-  program.register('hello world matteo', noop3)
-  program.register('hello world', noop2)
-
-  t.equal(program.lookup('hel')[0].func, noop1)
-  t.deepEqual(program.lookup('hel wor mat'), [])
-  t.equal(program.lookup('hello world matt')[0].func, noop3)
-  t.equal(program.lookup('hello wor')[0].func, noop2)
-  t.deepEqual(program.lookup('hel wor'), [])
-
   t.end()
 })
