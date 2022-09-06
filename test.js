@@ -237,3 +237,53 @@ test('leven', function (t) {
   t.is(leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'), 2)
   t.end()
 })
+
+test('max distance', function (t) {
+  const program = commist({ maxDistance: 2 })
+
+  function noop1 () {}
+  function noop2 () {}
+  function noop3 () {}
+
+  program.register('hello', noop1)
+  program.register('hello world matteo', noop3)
+  program.register('hello world', noop2)
+
+  t.equal(program.lookup('hel')[0].func, noop1)
+  t.equal(program.lookup('hel wor mat')[0].func, noop2)
+  t.equal(program.lookup('hello world matt')[0].func, noop3)
+  t.equal(program.lookup('hello wor')[0].func, noop2)
+  t.deepEqual(program.lookup('he wor'), [])
+
+  t.end()
+})
+
+test('help foobar vs start', function (t) {
+  const program = commist({ maxDistance: 2 })
+
+  function noop1 () {}
+  function noop2 () {}
+
+  program.register('help', noop1)
+  program.register('start', noop2)
+
+  t.equal(program.lookup('help')[0].func, noop1)
+  t.deepEqual(program.lookup('help foobar')[0].func, noop1)
+  t.equal(program.lookup('start')[0].func, noop2)
+
+  t.end()
+})
+
+test('registering a command with maxDistance', function (t) {
+  t.plan(2)
+
+  const program = commist({ maxDistance: 2 })
+
+  program.register('hello', function (args) {
+    t.deepEqual(args, ['a', '-x', '23'])
+  })
+
+  const result = program.parse(['hello', 'a', '-x', '23'])
+
+  t.notOk(result, 'must return null, the command have been handled')
+})

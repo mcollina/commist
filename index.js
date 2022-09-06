@@ -26,25 +26,40 @@ SOFTWARE.
 
 const leven = require('./leven')
 
-function commist () {
+function commist (opts) {
+  opts = opts || {}
   const commands = []
+  const maxDistance = opts.maxDistance || Infinity
 
   function lookup (array) {
     if (typeof array === 'string') { array = array.split(' ') }
 
-    return commands.map(function (cmd) {
+    let res = commands.map(function (cmd) {
       return cmd.match(array)
-    }).filter(function (match) {
-      return match.partsNotMatched === 0
-    }).sort(function (a, b) {
+    })
+
+    res = res.filter(function (match) {
+      if (match.partsNotMatched !== 0) {
+        return false
+      }
+      return match.distances.reduce(function (acc, curr) {
+        return acc && curr <= maxDistance
+      }, true)
+    })
+
+    res = res.sort(function (a, b) {
       if (a.inputNotMatched > b.inputNotMatched) { return 1 }
 
       if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance) { return 1 }
 
       return -1
-    }).map(function (match) {
+    })
+
+    res = res.map(function (match) {
       return match.cmd
     })
+
+    return res
   }
 
   function parse (args) {
@@ -122,6 +137,7 @@ function CommandMatch (cmd, array) {
   this.partsNotMatched = cmd.length - this.distances.length
   this.inputNotMatched = array.length - this.distances.length
   this.totalDistance = this.distances.reduce(function (acc, i) { return acc + i }, 0)
+  // console.log(this, array)
 }
 
 module.exports = commist
