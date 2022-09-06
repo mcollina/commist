@@ -26,8 +26,10 @@ SOFTWARE.
 
 const leven = require('./leven')
 
-function commist () {
+function commist (opts) {
+  opts = opts || {}
   const commands = []
+  const maxDistance = opts.maxDistance || Infinity
 
   function lookup (array) {
     if (typeof array === 'string') { array = array.split(' ') }
@@ -35,11 +37,14 @@ function commist () {
     return commands.map(function (cmd) {
       return cmd.match(array)
     }).filter(function (match) {
-      return match.partsNotMatched === 0
+      if (match.cmd.strict && match.totalDistance > 0) {
+        return false
+      }
+      return match.totalDistance <= maxDistance
     }).sort(function (a, b) {
-      if (a.inputNotMatched > b.inputNotMatched) { return 1 }
+      if (a.totalDistance > b.totalDistance) { return 1 }
 
-      if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance) { return 1 }
+      if (a.totalDistance === b.totalDistance && a.partsNotMatched > b.partsNotMatched) { return 1 }
 
       return -1
     }).map(function (match) {
@@ -107,20 +112,32 @@ Command.prototype.match = function match (string) {
 
 function CommandMatch (cmd, array) {
   this.cmd = cmd
-  this.distances = cmd.parts.map(function (elem, i) {
+  this.partsNotMatched = 0
+  this.distances = cmd.parts.map((elem, i) => {
     if (array[i] !== undefined) {
       if (cmd.strict) {
-        return elem === array[i] ? 0 : undefined
+        if (elem === array[i]) {
+          return 0
+        } else {
+          this.partsNotMatched++
+          return elem.length
+        }
       } else {
         return leven(elem, array[i])
       }
-    } else { return undefined }
-  }).filter(function (distance, i) {
-    return distance !== undefined && distance < cmd.parts[i].length
+    } else {
+      this.partsNotMatched++
+      return elem.length
+    }
   })
 
-  this.partsNotMatched = cmd.length - this.distances.length
-  this.inputNotMatched = array.length - this.distances.length
+  if (this.distances.length < array.length) {
+    for (let i = this.distances.length; i < array.length; i++) {
+      this.partsNotMatched++
+      this.distances.push(array[i].length)
+    }
+  }
+
   this.totalDistance = this.distances.reduce(function (acc, i) { return acc + i }, 0)
 }
 
