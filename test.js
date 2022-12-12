@@ -95,8 +95,7 @@ test('registering ambiguous commands throws exception', function (t) {
   try {
     program.register('hello world', noop)
     t.ok(false, 'must throw if double-registering the same command')
-  } catch (err) {
-  }
+  } catch (err) {}
 
   t.end()
 })
@@ -169,6 +168,85 @@ test('executing commands from abbreviations', function (t) {
   program.parse(['hel', 'a', '-x', '23'])
 })
 
+test('executing async command', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', async function (args) {
+    t.deepEqual(args, ['a', '-x', '23'])
+  })
+
+  program.parseAsync(['hello', 'a', '-x', '23'])
+})
+
+test('async execution resolves when correctly matched one', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', async function () {
+    return 1337
+  })
+
+  program.parseAsync(['hello', 'a', '-x', '23']).then((result) => {
+    t.equal(result, null)
+  })
+})
+
+test('async execution rejects with args if no commands matched', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', async function () {
+    t.ok(false, 'command should not be picked')
+  })
+
+  program.parseAsync(['whoops', 'a', '-x', '23']).catch((args) => {
+    t.deepEqual(args, ['whoops', 'a', '-x', '23'])
+  })
+})
+
+test('async execution should wait intil registered command finishes', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', async function () {
+    const res = await Promise.resolve(42)
+    return res
+  })
+
+  program.parseAsync(['hello', 'a', '-x', '23']).then((result) => {
+    t.equal(result, null)
+  })
+})
+
+test('async execution should work with sync commands', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', function (args) {
+    t.deepEqual(args, ['a', '-x', '23'])
+  })
+
+  program.parseAsync(['hello', 'a', '-x', '23'])
+})
+
+test('sync execution should work with async commands', function (t) {
+  t.plan(1)
+
+  const program = commist()
+
+  program.register('hello', async function (args) {
+    t.deepEqual(args, ['a', '-x', '23'])
+  })
+
+  program.parse(['hello', 'a', '-x', '23'])
+})
+
 test('one char command', function (t) {
   const program = commist()
 
@@ -234,7 +312,10 @@ test('leven', function (t) {
   t.is(leven('sturgeon', 'urgently'), 6)
   t.is(leven('levenshtein', 'frankenstein'), 6)
   t.is(leven('distance', 'difference'), 5)
-  t.is(leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'), 2)
+  t.is(
+    leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'),
+    2
+  )
   t.end()
 })
 
