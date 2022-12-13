@@ -40,18 +40,16 @@ which let you await on registered commands execution.
 
 const program = require('commist')()
 
-await program
+const result = await program
   .register('abcd', async function(args) {
     await executeCommand(args)
     await doOtherStuff()
   })
   .parseAsync(process.argv.splice(2))
-  .then(() => {
-    console.log('command executed correctly')
-  })
-  .catch((result) => {
-    console.log('no command called, args', result)
-  })
+
+if (result) {
+  console.log('no command called, args', result)
+}
 ```
 
 When calling _commist_ programs, you can abbreviate down to three char

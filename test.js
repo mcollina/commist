@@ -195,7 +195,7 @@ test('async execution resolves when correctly matched one', function (t) {
   })
 })
 
-test('async execution rejects with args if no commands matched', function (t) {
+test('async execution resolves with args if no commands matched', function (t) {
   t.plan(1)
 
   const program = commist()
@@ -204,7 +204,7 @@ test('async execution rejects with args if no commands matched', function (t) {
     t.ok(false, 'command should not be picked')
   })
 
-  program.parseAsync(['whoops', 'a', '-x', '23']).catch((args) => {
+  program.parseAsync(['whoops', 'a', '-x', '23']).then((args) => {
     t.deepEqual(args, ['whoops', 'a', '-x', '23'])
   })
 })

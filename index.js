@@ -84,7 +84,7 @@ function commist (opts) {
       return null
     }
 
-    return Promise.reject(args)
+    return args
   }
 
   function register (inputCommand, func) {
