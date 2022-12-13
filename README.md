@@ -32,6 +32,26 @@ if (result) {
 }
 ```
 
+To handle `async` operations, use `parseAsync` instead,
+which let you await on registered commands execution.
+
+```js
+'use strict'
+
+const program = require('commist')()
+
+const result = await program
+  .register('abcd', async function(args) {
+    await executeCommand(args)
+    await doOtherStuff()
+  })
+  .parseAsync(process.argv.splice(2))
+
+if (result) {
+  console.log('no command called, args', result)
+}
+```
+
 When calling _commist_ programs, you can abbreviate down to three char
 words. In the above example, these are valid commands:
 

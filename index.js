@@ -68,7 +68,19 @@ function commist (opts) {
     if (matching.length > 0) {
       matching[0].call(args)
 
-      // return null if there is nothing left to do
+      // return null to indicate there is nothing left to do
+      return null
+    }
+
+    return args
+  }
+
+  async function parseAsync (args) {
+    const matching = lookup(args)
+
+    if (matching.length > 0) {
+      await matching[0].call(args)
+      // return null to indicate there is nothing left to do
       return null
     }
 
@@ -100,6 +112,7 @@ function commist (opts) {
   return {
     register,
     parse,
+    parseAsync,
     lookup
   }
 }
@@ -113,7 +126,7 @@ function Command (options) {
 }
 
 Command.prototype.call = function call (argv) {
-  this.func(argv.slice(this.length))
+  return this.func(argv.slice(this.length))
 }
 
 Command.prototype.match = function match (string) {
@@ -137,7 +150,6 @@ function CommandMatch (cmd, array) {
   this.partsNotMatched = cmd.length - this.distances.length
   this.inputNotMatched = array.length - this.distances.length
   this.totalDistance = this.distances.reduce(function (acc, i) { return acc + i }, 0)
-  // console.log(this, array)
 }
 
 module.exports = commist
