@@ -95,7 +95,8 @@ test('registering ambiguous commands throws exception', function (t) {
   try {
     program.register('hello world', noop)
     t.ok(false, 'must throw if double-registering the same command')
-  } catch (err) {}
+  } catch (err) {
+  }
 
   t.end()
 })
@@ -312,10 +313,7 @@ test('leven', function (t) {
   t.is(leven('sturgeon', 'urgently'), 6)
   t.is(leven('levenshtein', 'frankenstein'), 6)
   t.is(leven('distance', 'difference'), 5)
-  t.is(
-    leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'),
-    2
-  )
+  t.is(leven('因為我是中國人所以我會說中文', '因為我是英國人所以我會說英文'), 2)
   t.end()
 })
 

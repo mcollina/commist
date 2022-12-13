@@ -32,9 +32,7 @@ function commist (opts) {
   const maxDistance = opts.maxDistance || Infinity
 
   function lookup (array) {
-    if (typeof array === 'string') {
-      array = array.split(' ')
-    }
+    if (typeof array === 'string') { array = array.split(' ') }
 
     let res = commands.map(function (cmd) {
       return cmd.match(array)
@@ -50,16 +48,9 @@ function commist (opts) {
     })
 
     res = res.sort(function (a, b) {
-      if (a.inputNotMatched > b.inputNotMatched) {
-        return 1
-      }
+      if (a.inputNotMatched > b.inputNotMatched) { return 1 }
 
-      if (
-        a.inputNotMatched === b.inputNotMatched &&
-        a.totalDistance > b.totalDistance
-      ) {
-        return 1
-      }
+      if (a.inputNotMatched === b.inputNotMatched && a.totalDistance > b.totalDistance) { return 1 }
 
       return -1
     })
@@ -90,7 +81,7 @@ function commist (opts) {
     if (matching.length > 0) {
       await matching[0].call(args)
       // return null to indicate there is nothing left to do
-      return Promise.resolve(null)
+      return null
     }
 
     return Promise.reject(args)
@@ -110,11 +101,7 @@ function commist (opts) {
     const matching = lookup(commandOptions.command)
 
     matching.forEach(function (match) {
-      if (match.string === commandOptions.command) {
-        throw new Error(
-          'command already registered: ' + commandOptions.command
-        )
-      }
+      if (match.string === commandOptions.command) { throw new Error('command already registered: ' + commandOptions.command) }
     })
 
     commands.push(new Command(commandOptions))
@@ -148,28 +135,21 @@ Command.prototype.match = function match (string) {
 
 function CommandMatch (cmd, array) {
   this.cmd = cmd
-  this.distances = cmd.parts
-    .map(function (elem, i) {
-      if (array[i] !== undefined) {
-        if (cmd.strict) {
-          return elem === array[i] ? 0 : undefined
-        } else {
-          return leven(elem, array[i])
-        }
+  this.distances = cmd.parts.map(function (elem, i) {
+    if (array[i] !== undefined) {
+      if (cmd.strict) {
+        return elem === array[i] ? 0 : undefined
       } else {
-        return undefined
+        return leven(elem, array[i])
       }
-    })
-    .filter(function (distance, i) {
-      return distance !== undefined && distance < cmd.parts[i].length
-    })
+    } else { return undefined }
+  }).filter(function (distance, i) {
+    return distance !== undefined && distance < cmd.parts[i].length
+  })
 
   this.partsNotMatched = cmd.length - this.distances.length
   this.inputNotMatched = array.length - this.distances.length
-  this.totalDistance = this.distances.reduce(function (acc, i) {
-    return acc + i
-  }, 0)
-  // console.log(this, array)
+  this.totalDistance = this.distances.reduce(function (acc, i) { return acc + i }, 0)
 }
 
 module.exports = commist
